@@ -1,10 +1,17 @@
 # Hackintosh EFI - MSI B760M GAMING PLUS WIFI + i7-12700KF
 
 > [!NOTE]
-> **Project Status:** ✅ **macOS Sequoia — Working**
-> This EFI is confirmed working on **macOS Sequoia 15**. Wi-Fi and Bluetooth via `itlwm` are fully functional.
+> **Project Status:** ✅ **macOS Sequoia & Tahoe — Working**
+> This EFI is confirmed working on **macOS Sequoia 15** and **macOS Tahoe 26**. Wi-Fi and Bluetooth via `itlwm` are fully functional.
 
 This repository contains the OpenCore configuration for a desktop Hackintosh system based on the 12th generation of Intel processors (Alder Lake).
+
+## 🏷️ Version History
+
+| Tag | macOS | Status | Notes |
+|-----|-------|--------|-------|
+| [`v1.0-sequoia`](https://github.com/spacecodee/MSI-B760M-GAMING-PLUS-WIFI-Intel-I7-12700KF-RX-6600-EFI-V2/releases/tag/v1.0-sequoia) | macOS Sequoia 15 | ✅ Stable | First stable release |
+| [`v1.1-tahoe`](https://github.com/spacecodee/MSI-B760M-GAMING-PLUS-WIFI-Intel-I7-12700KF-RX-6600-EFI-V2/releases/tag/v1.1-tahoe) | macOS Tahoe 26 | ✅ Working | USB port schema fix for Tahoe |
 
 ## 💻 Hardware Specifications
 
@@ -22,6 +29,7 @@ This repository contains the OpenCore configuration for a desktop Hackintosh sys
 ## ✅ What Works
 
 - [x] macOS Sequoia boot & installation
+- [x] macOS Tahoe boot & installation
 - [x] AMD Radeon RX 6600 (native support via WhateverGreen)
 - [x] Intel Wi-Fi via `itlwm`
 - [x] Intel Bluetooth via `IntelBluetoothFirmware` + `BlueToolFixup`
@@ -44,6 +52,22 @@ This repository contains the OpenCore configuration for a desktop Hackintosh sys
 2. **Intel Wi-Fi / BT:** Using `itlwm` + `IntelBluetoothFirmware` stack (SIP-compatible)
 3. **OTA Updates:** `sbvmm` injected in `revpatch` for System Settings update support
 4. **Alder Lake HT Patch:** `_cpu_thread_alloc` kernel patch with `MinKernel` = `24.0.0`
+5. **XhciPortLimit:** Enabled (`true`) — required for Tahoe compatibility with the USB port map
+
+### 🔧 Tahoe USB Fix (v1.1)
+
+macOS Tahoe changed the USB port descriptor schema inside `USBMap.kext/Contents/Info.plist`.
+Previous Sequoia maps only declared a `port` key per entry. **Tahoe requires two additional keys per port:**
+
+```xml
+<key>usb-port-number</key>
+<data>AQAAAA==</data>   <!-- port number encoded as little-endian Base64 -->
+<key>usb-port-type</key>
+<integer>3</integer>    <!-- 0 = USB 2.0, 3 = USB 3.x, 255 = internal -->
+```
+
+Without these keys, the HID (Human Interface Device) stack fails to initialize after kernel handoff,
+leaving keyboard and mouse completely unresponsive at the login screen even though the system is running.
 
 ### 📦 Included Kexts
 
@@ -59,7 +83,7 @@ This repository contains the OpenCore configuration for a desktop Hackintosh sys
 ### 📝 Injected SSDTs
 
 | SSDT | Purpose |
-|------|---------|
+|------|---------| 
 | `SSDT-PLUG-ALT` | Power management for Alder Lake |
 | `SSDT-RTCAWAC` | System clock fix for Intel 700 series |
 | `SSDT-EC` + `SSDT-USBX` | Fake EC controller and USB power |
@@ -82,3 +106,4 @@ This repository contains the OpenCore configuration for a desktop Hackintosh sys
 
 ---
 *If you use this EFI, always generate your own SMBIOS serials with GenSMBIOS before booting.*
+
