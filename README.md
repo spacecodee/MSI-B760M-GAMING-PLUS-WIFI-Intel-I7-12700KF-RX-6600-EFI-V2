@@ -1,61 +1,84 @@
 # Hackintosh EFI - MSI B760M GAMING PLUS WIFI + i7-12700KF
 
-> [!WARNING]
-> **Project Status:** 🚧 **EXPERIMENTAL / UNTESTED** 🚧
-> This EFI has been built to run natively on **macOS Sequoia** and allow a future upgrade to **macOS Tahoe**. It is currently in the testing phase.
+> [!NOTE]
+> **Project Status:** ✅ **macOS Sequoia — Working**
+> This EFI is confirmed working on **macOS Sequoia 15**. Wi-Fi and Bluetooth via `itlwm` are fully functional.
 
 This repository contains the OpenCore configuration for a desktop Hackintosh system based on the 12th generation of Intel processors (Alder Lake).
 
 ## 💻 Hardware Specifications
 
-*   **Motherboard:** MSI B760M GAMING PLUS WIFI
-*   **Processor (CPU):** Intel Core i7-12700KF (12 Cores: 8 P-Cores / 4 E-Cores)
-*   **Graphics Card (GPU):** XFX Swft 210 AMD Radeon RX 6600 8GB GDDR6
-*   **RAM:** Crucial Pro DDR5 64GB (2x32GB) 6000MHz CL40
-*   **Storage:** Lexar 2TB NM790 SSD PCIe Gen4 NVMe M.2
-*   **Base Audio:** Audio via USB Interface (Class Compliant - No VoodooHDA/AppleALC needed)
-*   **Cooler:** Cooler Master Hyper 620S
-*   **Power Supply (PSU):** Cooler Master GX II GOLD 750W
+| Component | Details |
+|-----------|---------|
+| **Motherboard** | MSI B760M GAMING PLUS WIFI |
+| **CPU** | Intel Core i7-12700KF (12 Cores: 8P + 4E) |
+| **GPU** | XFX Swft 210 AMD Radeon RX 6600 8GB GDDR6 |
+| **RAM** | Crucial Pro DDR5 64GB (2×32GB) 6000MHz CL40 |
+| **Storage** | Lexar 2TB NM790 SSD PCIe Gen4 NVMe M.2 |
+| **Audio** | USB Audio Interface (Class Compliant — no AppleALC needed) |
+| **Cooler** | Cooler Master Hyper 620S |
+| **PSU** | Cooler Master GX II GOLD 750W |
+
+## ✅ What Works
+
+- [x] macOS Sequoia boot & installation
+- [x] AMD Radeon RX 6600 (native support via WhateverGreen)
+- [x] Intel Wi-Fi via `itlwm`
+- [x] Intel Bluetooth via `IntelBluetoothFirmware` + `BlueToolFixup`
+- [x] USB ports (mapped via USBToolBox + USBMap, done on Windows)
+- [x] NVMe SSD (Lexar NM790)
+- [x] CPU power management (Alder Lake E-cores + P-cores)
+- [x] OTA updates (via `sbvmm` revpatch)
+- [x] SIP fully enabled
 
 ## ⚙️ EFI Technical Details
 
-*   **Bootloader:** OpenCore
-*   **SMBIOS:** `MacPro7,1`
-*   **SIP (System Integrity Protection):** Fully Enabled (`csr-active-config` set to `00000000`)
-*   **CPU Spoofing:** The i7-12700KF is spoofed via `Cpuid1Data` to present itself as a Comet Lake (ID `0x0A0655`) due to the lack of official Apple support for Gen 12.
+- **Bootloader:** OpenCore REL-107
+- **SMBIOS:** `MacPro7,1`
+- **SIP (System Integrity Protection):** Fully Enabled (`csr-active-config` = `00000000`)
+- **CPU Spoofing:** i7-12700KF spoofed as Comet Lake (`Cpuid1Data`: `0x0A0655`) for Apple compatibility
+- **Boot Args:** `-v keepsyms=1 debug=0x100 agdpmod=pikera ctrsmt=full revpatch=sbvmm`
 
 ### 🛠️ Critical Configurations
-1.  **HyperThreading Patch:** A kernel patch was configured (`_cpu_thread_alloc`) with `MinKernel` pointing to `24.0.0` (Sequoia and above).
-2.  **Intel Wi-Fi/BT:** Using the `itlwm` and `IntelBluetoothFirmware` stack to keep SIP Enabled.
-3.  **OTA Updates:** Injected `sbvmm` in `revpatch` to ensure support for installing system updates directly via System Settings.
+1. **USB Mapping:** Mapped via USBToolBox on Windows; deployed as `USBToolBox.kext` + `USBMap.kext`
+2. **Intel Wi-Fi / BT:** Using `itlwm` + `IntelBluetoothFirmware` stack (SIP-compatible)
+3. **OTA Updates:** `sbvmm` injected in `revpatch` for System Settings update support
+4. **Alder Lake HT Patch:** `_cpu_thread_alloc` kernel patch with `MinKernel` = `24.0.0`
 
-### 📂 Included Kexts
-*   **Essentials:** Lilu, WhateverGreen, VirtualSMC
-*   **Network / Bluetooth:** RTL812xLucy, itlwm, IntelBluetoothFirmware, IntelBTPatcher, BlueToolFixup
-*   **CPU / Alder Lake:** RestrictEvents, CpuTopologyRebuild, CPUFriend, CPUFriendDataProvider
-*   **SMC Sensors:** SMCProcessor, SMCSuperIO, SMCRadeonSensors
-*   **Storage / USB:** NVMeFix, SATA-unsupported, USBToolBox, USBMap
+### 📦 Included Kexts
+
+| Category | Kexts |
+|----------|-------|
+| **Essentials** | Lilu, WhateverGreen, VirtualSMC |
+| **Wi-Fi / BT** | itlwm, IntelBluetoothFirmware, IntelBTPatcher, BlueToolFixup |
+| **Ethernet** | RTL812xLucy |
+| **CPU / Alder Lake** | RestrictEvents, CpuTopologyRebuild, CPUFriend, CPUFriendDataProvider |
+| **SMC Sensors** | SMCProcessor, SMCSuperIO, SMCRadeonSensors |
+| **Storage / USB** | NVMeFix, SATA-unsupported, USBToolBox, USBMap |
 
 ### 📝 Injected SSDTs
-*   `SSDT-PLUG-ALT` (Power management for Alder Lake)
-*   `SSDT-RTCAWAC` (System clock for Intel 700 series)
-*   `SSDT-EC` & `SSDT-USBX` (Fake EC controller and USB power)
-*   `SSDT-SBUS-MCHC-DVL0` (Apple SMBus injection)
-*   `SSDT-HPET` (IRQ conflicts resolution)
-*   `SSDT-USB-Reset` (USB controllers reset)
 
-## 📌 Next Steps
-1.  Generate valid SMBIOS (`SystemSerialNumber`, `MLB`, `SystemUUID`) and insert them into the `config.plist`.
-2.  Format the bootable USB or the EFI partition of the Lexar NM790.
-3.  Test boot in the **macOS Sequoia** environment.
-4.  Perform stability tests on the Lexar NM790, considering its Maxio controller.
-5.  Upgrade to **macOS Tahoe**.
+| SSDT | Purpose |
+|------|---------|
+| `SSDT-PLUG-ALT` | Power management for Alder Lake |
+| `SSDT-RTCAWAC` | System clock fix for Intel 700 series |
+| `SSDT-EC` + `SSDT-USBX` | Fake EC controller and USB power |
+| `SSDT-SBUS-MCHC-DVL0` | Apple SMBus injection |
+| `SSDT-HPET` | IRQ conflict resolution |
+| `SSDT-USB-Reset` | USB controller reset |
+
+## ⚠️ Important Notes
+
+- **Generate your own SMBIOS serials** before using this EFI. Use [GenSMBIOS](https://github.com/corpnewt/GenSMBIOS) to create unique `SystemSerialNumber`, `MLB`, and `SystemUUID` values. Using shared serials will break iServices.
+- **iServices** (iMessage, FaceTime, iCloud) require valid, unique SMBIOS serials.
+- This EFI has **no Secure Boot** support — keep it disabled in BIOS.
 
 ## 🏆 Credits
 
-A massive thank you to the open-source Hackintosh community, and specifically to:
-*   [Acidanthera](https://github.com/acidanthera) for OpenCore, Lilu, WhateverGreen, VirtualSMC, and all the essential tools that make this possible.
-*   [Dortania](https://dortania.github.io/OpenCore-Install-Guide/) for their incredibly detailed OpenCore Install Guide and continuous support.
+- [Acidanthera](https://github.com/acidanthera) — OpenCore, Lilu, WhateverGreen, VirtualSMC and all core tools
+- [Dortania](https://dortania.github.io/OpenCore-Install-Guide/) — OpenCore Install Guide
+- [USBToolBox](https://github.com/USBToolBox/tool) — USB mapping tool
+- [OpenIntelWireless](https://github.com/OpenIntelWireless) — itlwm & IntelBluetoothFirmware
 
 ---
-*If you use this configuration, make sure to generate your own serials for iServices using tools like GenSMBIOS.*
+*If you use this EFI, always generate your own SMBIOS serials with GenSMBIOS before booting.*
