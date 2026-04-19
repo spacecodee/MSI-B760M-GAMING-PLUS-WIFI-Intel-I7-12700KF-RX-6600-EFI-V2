@@ -12,6 +12,7 @@ This repository contains the OpenCore configuration for a desktop Hackintosh sys
 |-----|-------|--------|-------|
 | [`v1.0-sequoia`](https://github.com/spacecodee/MSI-B760M-GAMING-PLUS-WIFI-Intel-I7-12700KF-RX-6600-EFI-V2/releases/tag/v1.0-sequoia) | macOS Sequoia 15 | ✅ Stable | First stable release |
 | [`v1.1-tahoe`](https://github.com/spacecodee/MSI-B760M-GAMING-PLUS-WIFI-Intel-I7-12700KF-RX-6600-EFI-V2/releases/tag/v1.1-tahoe) | macOS Tahoe 26 | ✅ Working | USB port schema fix for Tahoe |
+| [`v1.2-tahoe`](https://github.com/spacecodee/MSI-B760M-GAMING-PLUS-WIFI-Intel-I7-12700KF-RX-6600-EFI-V2/releases/tag/v1.2-tahoe) | macOS Tahoe 26 | ✅ Working | OpenCanopy theme, debug off, picker tuning |
 
 ## 💻 Hardware Specifications
 
@@ -45,7 +46,7 @@ This repository contains the OpenCore configuration for a desktop Hackintosh sys
 - **SMBIOS:** `MacPro7,1`
 - **SIP (System Integrity Protection):** Fully Enabled (`csr-active-config` = `00000000`)
 - **CPU Spoofing:** i7-12700KF spoofed as Comet Lake (`Cpuid1Data`: `0x0A0655`) for Apple compatibility
-- **Boot Args:** `-v keepsyms=1 debug=0x100 agdpmod=pikera ctrsmt=full revpatch=sbvmm`
+- **Boot Args:** `agdpmod=pikera ctrsmt=full revpatch=sbvmm`
 
 ### 🛠️ Critical Configurations
 1. **USB Mapping:** Mapped via USBToolBox on Windows; deployed as `USBToolBox.kext` + `USBMap.kext`
@@ -68,6 +69,27 @@ Previous Sequoia maps only declared a `port` key per entry. **Tahoe requires two
 
 Without these keys, the HID (Human Interface Device) stack fails to initialize after kernel handoff,
 leaving keyboard and mouse completely unresponsive at the login screen even though the system is running.
+
+### 🎨 OpenCanopy Theme & Picker Tuning (v1.2)
+
+Upgraded the boot picker to use the **chris1111/Flavours-macOS26** OpenCanopy theme with the following configuration:
+
+| Key | Value | Notes |
+|-----|-------|-------|
+| `PickerMode` | `External` | Enables OpenCanopy GUI picker |
+| `PickerVariant` | `chris1111\Flavours-macOS26` | macOS 26-style icon set |
+| `PickerAttributes` | `145` | Mouse/pointer support + volume icons (128 + 17) |
+| `HibernateSkipsPicker` | `true` | Skip picker on wake from hibernation |
+| `HideAuxiliary` | `true` | Tools hidden by default — press **Space** to reveal |
+
+Debug logging was fully disabled for a clean boot experience:
+
+| Key | Value | Effect |
+|-----|-------|--------|
+| `Target` | `0` | No log files written, no verbose screen |
+| `AppleDebug` | `false` | Kernel debug output off |
+| `ApplePanic` | `false` | No panic log files |
+| `boot-args` | removed `-v keepsyms=1 debug=0x100` | Silent graphical boot |
 
 ### 📦 Included Kexts
 
