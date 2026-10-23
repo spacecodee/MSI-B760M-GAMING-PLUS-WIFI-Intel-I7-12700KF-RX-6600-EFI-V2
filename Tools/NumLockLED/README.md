@@ -36,17 +36,22 @@ This script:
 2. Creates `~/Library/LaunchAgents/local.numled.plist`, which runs `numled --daemon` at every login.
 3. Starts it immediately.
 
-The daemon turns the LED back on when a keyboard connects and after wake from sleep.
+### Required: Input Monitoring
 
-### Optional: Caps Lock
-
-macOS rewrites all keyboard LEDs when Caps Lock toggles, which clears Num Lock. To restore the LED after Caps Lock, the daemon must read key events:
+Processes started by launchd cannot open keyboards without Input Monitoring, so the daemon cannot touch the LED until you allow it. Running `./numled on` from Terminal works without this step because Terminal already has the permission.
 
 1. Open **System Settings > Privacy & Security > Input Monitoring**.
-2. Click **+** and add `~/.local/bin/numled` (press `Cmd+Shift+G` to type the path).
-3. Restart the daemon: `launchctl kickstart -k gui/$(id -u)/local.numled`
+2. Turn on `numled`. If it is not listed, click **+** and add `~/.local/bin/numled` (press `Cmd+Shift+G` to type the path).
 
-Without this permission, everything else still works.
+The daemon waits until the permission is granted, then starts. No restart is needed.
+
+Each reinstall builds a new binary, and macOS treats it as a different app: turn the permission off and on again after running `./install.sh`.
+
+### What the daemon does
+
+- Turns the LED on when a keyboard connects and after wake from sleep.
+- Restores it after Caps Lock presses (macOS rewrites all keyboard LEDs when Caps Lock toggles).
+- Checks the LED every second and turns it back on if anything cleared it, such as macOS during login.
 
 ## Check status
 

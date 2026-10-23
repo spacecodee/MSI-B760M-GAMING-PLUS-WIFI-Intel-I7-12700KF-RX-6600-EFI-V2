@@ -7,7 +7,8 @@
 //   numled on        Turn the Num Lock LED on once and exit.
 //   numled off       Turn the Num Lock LED off once and exit.
 //   numled --daemon  Keep the LED on: re-apply on keyboard connect,
-//                    after wake from sleep and after Caps Lock presses.
+//                    after wake from sleep, after Caps Lock presses
+//                    and whenever a 1 s watchdog finds it off.
 
 import Foundation
 import IOKit.hid
@@ -37,6 +38,23 @@ func setNumLock(_ device: IOHIDDevice, on: Bool) -> Bool {
         }
     }
     return applied
+}
+
+/// Reads the Num Lock LED state from the kernel's cached element value (no USB traffic).
+/// A long-lived handle only sees its own writes, so a fresh handle is opened per read
+/// to also see writes made by macOS.
+func isNumLockOn(_ device: IOHIDDevice) -> Bool? {
+    guard let fresh = IOHIDDeviceCreate(kCFAllocatorDefault, IOHIDDeviceGetService(device)),
+          IOHIDDeviceOpen(fresh, IOOptionBits(kIOHIDOptionsTypeNone)) == kIOReturnSuccess else {
+        return nil
+    }
+    defer { IOHIDDeviceClose(fresh, IOOptionBits(kIOHIDOptionsTypeNone)) }
+    guard let element = (IOHIDDeviceCopyMatchingElements(fresh, numLockMatch, IOOptionBits(kIOHIDOptionsTypeNone)) as? [IOHIDElement])?.first else {
+        return nil
+    }
+    var value = Unmanaged.passUnretained(IOHIDValueCreateWithIntegerValue(kCFAllocatorDefault, element, 0, 0))
+    guard IOHIDDeviceGetValue(fresh, element, &value) == kIOReturnSuccess else { return nil }
+    return IOHIDValueGetIntegerValue(value.takeUnretainedValue()) != 0
 }
 
 func productName(_ device: IOHIDDevice) -> String {
@@ -82,6 +100,20 @@ case "on", "off":
     }
 
 case "--daemon":
+    // launchd redirects stdout to a log file; flush every line so the log stays current.
+    setvbuf(stdout, nil, _IOLBF, 0)
+
+    // Without Input Monitoring, launchd-started processes cannot open keyboards at all,
+    // so no LED write reaches the device. Terminal runs work because Terminal has it.
+    if IOHIDCheckAccess(kIOHIDRequestTypeListenEvent) != kIOHIDAccessTypeGranted {
+        print("\(Date()) Input Monitoring not granted. Enable numled in System Settings > Privacy & Security > Input Monitoring")
+        IOHIDRequestAccess(kIOHIDRequestTypeListenEvent)
+        while IOHIDCheckAccess(kIOHIDRequestTypeListenEvent) != kIOHIDAccessTypeGranted {
+            sleep(5)
+        }
+        print("\(Date()) Input Monitoring granted")
+    }
+
     // Keyboard connected (also fires once per keyboard at startup).
     IOHIDManagerRegisterDeviceMatchingCallback(manager, { _, _, _, device in
         setNumLock(device, on: true)
@@ -89,7 +121,6 @@ case "--daemon":
     }, nil)
 
     // macOS rewrites the whole LED report when Caps Lock toggles, which clears Num Lock.
-    // Reading key events needs Input Monitoring permission; without it this callback stays silent.
     IOHIDManagerSetInputValueMatching(manager, [
         kIOHIDElementUsagePageKey: kHIDPage_KeyboardOrKeypad,
         kIOHIDElementUsageKey: kHIDUsage_KeyboardCapsLock,
@@ -114,6 +145,14 @@ case "--daemon":
     }, &notifier)
     if rootPort != 0, let notifyPort {
         CFRunLoopAddSource(CFRunLoopGetMain(), IONotificationPortGetRunLoopSource(notifyPort).takeUnretainedValue(), .defaultMode)
+    }
+
+    // Watchdog: macOS clears the LED during login and on other LED writes we get no event for.
+    Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+        guard let devices = IOHIDManagerCopyDevices(manager) as? Set<IOHIDDevice> else { return }
+        for device in devices where isNumLockOn(device) == false && setNumLock(device, on: true) {
+            print("\(Date()) \(productName(device)): Num Lock LED was cleared, turned back on")
+        }
     }
 
     CFRunLoopRun()

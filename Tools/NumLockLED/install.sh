@@ -14,6 +14,8 @@ command -v swiftc >/dev/null || { echo "swiftc not found. Install it with: xcode
 echo "Building numled..."
 mkdir -p "$BIN_DIR" "$(dirname "$PLIST")"
 swiftc -O "$SRC_DIR/numled.swift" -o "$BIN"
+# Input Monitoring (TCC) needs a code identity; swiftc leaves Intel binaries unsigned.
+codesign --force --sign - --identifier "$LABEL" "$BIN"
 
 echo "Writing $PLIST..."
 cat > "$PLIST" <<PLIST
@@ -46,6 +48,6 @@ echo "Loading LaunchAgent..."
 launchctl bootout "gui/$(id -u)/$LABEL" 2>/dev/null || true
 launchctl bootstrap "gui/$(id -u)" "$PLIST"
 
-echo "Done. numled is running and starts at every login."
-echo "Optional: allow $BIN in System Settings > Privacy & Security > Input Monitoring"
-echo "so the LED comes back after pressing Caps Lock."
+echo "Done. numled starts at every login."
+echo "Required: enable numled in System Settings > Privacy & Security > Input Monitoring."
+echo "Without it the LED never turns on. Re-enable it after every reinstall (the binary changes)."
