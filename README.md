@@ -42,7 +42,7 @@ This repository contains the OpenCore configuration for a desktop Hackintosh sys
 
 ## ⚙️ EFI Technical Details
 
-- **Bootloader:** OpenCore REL-107
+- **Bootloader:** OpenCore REL-108 (1.0.8)
 - **SMBIOS:** `MacPro7,1`
 - **SIP (System Integrity Protection):** Fully Enabled (`csr-active-config` = `00000000`)
 - **CPU Spoofing:** i7-12700KF spoofed as Comet Lake (`Cpuid1Data`: `0x0A0655`) for Apple compatibility
