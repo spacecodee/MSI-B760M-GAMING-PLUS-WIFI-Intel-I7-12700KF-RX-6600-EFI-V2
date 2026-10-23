@@ -9,7 +9,7 @@ This repository contains the OpenCore configuration for a desktop Hackintosh sys
 ## 🏷️ Version History
 
 | Tag | macOS | Status | Notes |
-|-----|-------|--------|-------|
+| --- | --- | --- | --- |
 | [`v1.0-sequoia`](https://github.com/spacecodee/MSI-B760M-GAMING-PLUS-WIFI-Intel-I7-12700KF-RX-6600-EFI-V2/releases/tag/v1.0-sequoia) | macOS Sequoia 15 | ✅ Stable | First stable release |
 | [`v1.1-tahoe`](https://github.com/spacecodee/MSI-B760M-GAMING-PLUS-WIFI-Intel-I7-12700KF-RX-6600-EFI-V2/releases/tag/v1.1-tahoe) | macOS Tahoe 26 | ✅ Working | USB port schema fix for Tahoe |
 | [`v1.2-tahoe`](https://github.com/spacecodee/MSI-B760M-GAMING-PLUS-WIFI-Intel-I7-12700KF-RX-6600-EFI-V2/releases/tag/v1.2-tahoe) | macOS Tahoe 26 | ✅ Working | OpenCanopy theme, debug off, picker tuning |
@@ -17,7 +17,7 @@ This repository contains the OpenCore configuration for a desktop Hackintosh sys
 ## 💻 Hardware Specifications
 
 | Component | Details |
-|-----------|---------|
+| --- | --- |
 | **Motherboard** | MSI B760M GAMING PLUS WIFI |
 | **CPU** | Intel Core i7-12700KF (12 Cores: 8P + 4E) |
 | **GPU** | XFX Swft 210 AMD Radeon RX 6600 8GB GDDR6 |
@@ -49,6 +49,7 @@ This repository contains the OpenCore configuration for a desktop Hackintosh sys
 - **Boot Args:** `agdpmod=pikera ctrsmt=full revpatch=sbvmm`
 
 ### 🛠️ Critical Configurations
+
 1. **USB Mapping:** Mapped via USBToolBox on Windows; deployed as `USBToolBox.kext` + `USBMap.kext`
 2. **Intel Wi-Fi / BT:** Using `itlwm` + `IntelBluetoothFirmware` stack (SIP-compatible)
 3. **OTA Updates:** `sbvmm` injected in `revpatch` for System Settings update support
@@ -75,7 +76,7 @@ leaving keyboard and mouse completely unresponsive at the login screen even thou
 Upgraded the boot picker to use the **chris1111/Flavours-macOS26** OpenCanopy theme with the following configuration:
 
 | Key | Value | Notes |
-|-----|-------|-------|
+| --- | --- | --- |
 | `PickerMode` | `External` | Enables OpenCanopy GUI picker |
 | `PickerVariant` | `chris1111\Flavours-macOS26` | macOS 26-style icon set |
 | `PickerAttributes` | `145` | Mouse/pointer support + volume icons (128 + 17) |
@@ -85,7 +86,7 @@ Upgraded the boot picker to use the **chris1111/Flavours-macOS26** OpenCanopy th
 Debug logging was fully disabled for a clean boot experience:
 
 | Key | Value | Effect |
-|-----|-------|--------|
+| --- | --- | --- |
 | `Target` | `0` | No log files written, no verbose screen |
 | `AppleDebug` | `false` | Kernel debug output off |
 | `ApplePanic` | `false` | No panic log files |
@@ -94,7 +95,7 @@ Debug logging was fully disabled for a clean boot experience:
 ### 📦 Included Kexts
 
 | Category | Kexts |
-|----------|-------|
+| --- | --- |
 | **Essentials** | Lilu, WhateverGreen, VirtualSMC |
 | **Wi-Fi / BT** | itlwm, IntelBluetoothFirmware, IntelBTPatcher, BlueToolFixup |
 | **Ethernet** | RTL812xLucy |
@@ -105,7 +106,7 @@ Debug logging was fully disabled for a clean boot experience:
 ### 📝 Injected SSDTs
 
 | SSDT | Purpose |
-|------|---------| 
+| --- | --- |
 | `SSDT-PLUG-ALT` | Power management for Alder Lake |
 | `SSDT-RTCAWAC` | System clock fix for Intel 700 series |
 | `SSDT-EC` + `SSDT-USBX` | Fake EC controller and USB power |
@@ -128,4 +129,3 @@ Debug logging was fully disabled for a clean boot experience:
 
 ---
 *If you use this EFI, always generate your own SMBIOS serials with GenSMBIOS before booting.*
-
