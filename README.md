@@ -46,14 +46,15 @@ This repository contains the OpenCore configuration for a desktop Hackintosh sys
 - **SMBIOS:** `MacPro7,1`
 - **SIP (System Integrity Protection):** Fully Enabled (`csr-active-config` = `00000000`)
 - **CPU Spoofing:** i7-12700KF spoofed as Comet Lake (`Cpuid1Data`: `0x0A0655`) for Apple compatibility
-- **Boot Args:** `agdpmod=pikera ctrsmt=full revpatch=sbvmm`
+- **Boot Args:** `agdpmod=pikera`
+- **RestrictEvents (NVRAM `4D1FDA02-…`):** `revpatch=sbvmm,pci,cpuname`, `revcpu=1`, `revcpuname=12-Core Intel i7-12700KF`
 
 ### 🛠️ Critical Configurations
 
 1. **USB Mapping:** Mapped via USBToolBox on Windows; deployed as `USBToolBox.kext` + `USBMap.kext`
 2. **Intel Wi-Fi / BT:** Using `itlwm` + `IntelBluetoothFirmware` stack (SIP-compatible)
 3. **OTA Updates:** `sbvmm` injected in `revpatch` for System Settings update support
-4. **Alder Lake HT Patch:** `_cpu_thread_alloc` kernel patch with `MinKernel` = `24.0.0`
+4. **CPU name in About This Mac:** `cpuname` + `revcpu=1` show the custom `revcpuname` instead of "Unknown"; `pci` hides the MacPro7,1 PCI slots view. Keep `revpatch` out of `boot-args`: a boot-arg overrides the NVRAM value
 5. **XhciPortLimit:** Enabled (`true`) — required for Tahoe compatibility with the USB port map
 
 ### 🔧 Tahoe USB Fix (v1.1)
@@ -99,7 +100,7 @@ Debug logging was fully disabled for a clean boot experience:
 | **Essentials** | Lilu, WhateverGreen, VirtualSMC |
 | **Wi-Fi / BT** | itlwm, IntelBluetoothFirmware, IntelBTPatcher, BlueToolFixup |
 | **Ethernet** | RTL812xLucy |
-| **CPU / Alder Lake** | RestrictEvents, CpuTopologyRebuild, CPUFriend, CPUFriendDataProvider |
+| **CPU / Alder Lake** | RestrictEvents, CPUFriend, CPUFriendDataProvider |
 | **SMC Sensors** | SMCProcessor, SMCSuperIO, SMCRadeonSensors |
 | **Storage / USB** | NVMeFix, SATA-unsupported, USBToolBox, USBMap |
 
