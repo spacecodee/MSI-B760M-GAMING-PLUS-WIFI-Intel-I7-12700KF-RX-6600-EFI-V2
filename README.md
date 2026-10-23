@@ -119,6 +119,7 @@ Debug logging was fully disabled for a clean boot experience:
 - **Generate your own SMBIOS serials** before using this EFI. Use [GenSMBIOS](https://github.com/corpnewt/GenSMBIOS) to create unique `SystemSerialNumber`, `MLB`, and `SystemUUID` values. Using shared serials will break iServices.
 - **iServices** (iMessage, FaceTime, iCloud) require valid, unique SMBIOS serials.
 - This EFI has **no Secure Boot** support — keep it disabled in BIOS.
+- **Num Lock LED** stays off on external keyboards because macOS has no Num Lock. This is not an EFI issue; see [`Tools/NumLockLED`](Tools/NumLockLED/README.md) for a user-space fix.
 
 ## 🏆 Credits
 
