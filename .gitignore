@@ -30,3 +30,5 @@ Temporary Items
 Panics/
 # NumLockLED build output
 Tools/NumLockLED/numled
+# ATL
+.atl
