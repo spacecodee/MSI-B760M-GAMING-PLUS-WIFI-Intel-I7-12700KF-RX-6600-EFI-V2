@@ -54,7 +54,7 @@ This repository contains the OpenCore configuration for a desktop Hackintosh sys
 1. **USB Mapping:** Mapped via USBToolBox on Windows; deployed as `USBToolBox.kext` + `USBMap.kext`
 2. **Intel Wi-Fi / BT:** Using `itlwm` + `IntelBluetoothFirmware` stack (SIP-compatible)
 3. **OTA Updates:** `sbvmm` injected in `revpatch` for System Settings update support
-4. **CPU name in About This Mac:** `cpuname` + `revcpu=1` show the custom `revcpuname` instead of "Unknown"; `pci` hides the MacPro7,1 PCI slots view. Keep `revpatch` out of `boot-args`: a boot-arg overrides the NVRAM value
+4. **RestrictEvents `revpatch`:** `pci` hides the MacPro7,1 PCI slots view. Keep `revpatch` out of `boot-args`: a boot-arg overrides the NVRAM value. On Tahoe the CPU still shows as "Unknown" (cosmetic): `cpuname` only renames core counts that match a Mac Pro model, and this CPU reports 20 cores
 5. **XhciPortLimit:** Enabled (`true`) — required for Tahoe compatibility with the USB port map
 
 ### 🔧 Tahoe USB Fix (v1.1)
