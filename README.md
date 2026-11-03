@@ -27,6 +27,19 @@ This repository contains the OpenCore configuration for a desktop Hackintosh sys
 | **Cooler** | Cooler Master Hyper 620S |
 | **PSU** | Cooler Master GX II GOLD 750W |
 
+## 🪟 Switching to Windows 11
+
+Planning to install Windows 11 on this hardware? See [`INSTALAR_WINDOWS_11.md`](INSTALAR_WINDOWS_11.md) for the BIOS settings and install steps (Spanish). Where to get each driver:
+
+| Component | Hardware | Where to get the driver |
+| --- | --- | --- |
+| GPU | XFX RX 6600 8GB | AMD Adrenalin (amd.com/support), not the XFX package |
+| Chipset / ME / Serial IO | Intel B760 + i7-12700KF | Intel Driver & Support Assistant or the MSI board support page |
+| LAN | Realtek 2.5G | MSI board support page (download it before wiping the disk) |
+| Wi-Fi / Bluetooth | Intel | Windows Update or Intel Driver & Support Assistant |
+| SSD | Lexar NM790 NVMe | Native Windows NVMe driver |
+| Audio | USB class-compliant interface | No driver needed |
+
 ## ✅ What Works
 
 - [x] macOS Sequoia boot & installation

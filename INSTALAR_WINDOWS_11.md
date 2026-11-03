@@ -63,6 +63,21 @@ Si la EFI de OpenCore queda, puede seguir apareciendo en el menú de arranque.
 3. Verificá `tpm.msc` (TPM 2.0 presente) y `msinfo32` (*Secure Boot State*: **On**).
 4. Confirmá en Adrenalin que **Smart Access Memory** está activo.
 
+## 6. Dónde buscar los drivers
+
+| Componente | Hardware | Dónde buscarlo |
+| --- | --- | --- |
+| GPU | XFX RX 6600 8GB | **AMD Adrenalin** (amd.com/support). No usar el de XFX. |
+| Chipset / ME / Serial IO | Intel B760 + i7-12700KF | **Intel Driver & Support Assistant** o la página de la placa en msi.com |
+| LAN | Realtek 2.5G | Página de soporte de la placa en msi.com |
+| Wi-Fi y Bluetooth | Intel (`itlwm` + `IntelBluetoothFirmware` en macOS) | Windows Update, o Intel Driver & Support Assistant |
+| SSD | Lexar NM790 NVMe | Driver NVMe nativo de Windows. Firmware solo si hace falta (Lexar) |
+| Audio | Interfaz USB class-compliant | No necesita driver. El audio onboard usaría el Realtek de MSI |
+
+Descargá el driver de la **LAN** antes de formatear y guardalo en un pendrive.
+
+El modelo exacto del chip Intel Wi-Fi/BT (AX211, AX210, etc.) se ve en el Administrador de dispositivos.
+
 ## Problemas comunes
 
 | Síntoma | Causa probable | Solución |
